@@ -1,5 +1,6 @@
 <?php
 namespace App\Controllers;
+
 use App\Models\UserModel;
 use CodeIgniter\Controller;
 
@@ -12,16 +13,14 @@ class UserController extends Controller
 
     public function store()
     {
-        $model = new UserModel();
-
-        $data = [
+        $userModel = new UserModel();
+        $userModel->save([
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-        ];
+        ]);
 
-        $model->save($data);
-        return redirect()->to('/users/login');
+        return redirect()->to('/users/login')->with('success', 'Registration successful. Please login.');
     }
 
     public function login()
@@ -31,23 +30,25 @@ class UserController extends Controller
 
     public function authenticate()
     {
-        $model = new UserModel();
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        $userModel = new UserModel();
+        $user = $userModel->where('email', $this->request->getPost('email'))->first();
 
-        $user = $model->where('email', $email)->first();
+        if ($user && password_verify($this->request->getPost('password'), $user['password'])) {
+            session()->set([
+                'user_id' => $user['id'],
+                'username' => $user['username'],
+                'logged_in' => true
+            ]);
 
-        if ($user && password_verify($password, $user['password'])) {
-            session()->set(['user_id' => $user['id'], 'username' => $user['username'], 'logged_in' => true]);
-            return redirect()->to('/movies');
-        } else {
-            return redirect()->to('/users/login')->with('error', 'Invalid Credentials');
+            return redirect()->to('/movies')->with('success', 'Login successful.');
         }
+
+        return redirect()->to('/users/login')->with('error', 'Invalid credentials.');
     }
 
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/users/login');
+        return redirect()->to('/users/login')->with('success', 'Logged out successfully.');
     }
 }
