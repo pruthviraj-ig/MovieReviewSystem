@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\MovieModel;
@@ -16,7 +17,6 @@ class MovieController extends Controller
 
         $movies = $movieModel->findAll();
 
-        // Fetch reviews and include user info
         foreach ($movies as &$movie) {
             $reviews = $reviewModel->where('movie_id', $movie['id'])->findAll();
             foreach ($reviews as &$review) {

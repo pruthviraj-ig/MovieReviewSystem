@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\UserModel;
@@ -14,13 +15,13 @@ class UserController extends Controller
     public function store()
     {
         $userModel = new UserModel();
-        $userModel->save([
+        $data = [
             'username' => $this->request->getPost('username'),
             'email' => $this->request->getPost('email'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-        ]);
-
-        return redirect()->to('/users/login')->with('success', 'Registration successful. Please login.');
+        ];
+        $userModel->save($data);
+        return redirect()->to('/users/login')->with('success', 'Registration successful! Please log in.');
     }
 
     public function login()
@@ -37,10 +38,9 @@ class UserController extends Controller
             session()->set([
                 'user_id' => $user['id'],
                 'username' => $user['username'],
-                'logged_in' => true
+                'logged_in' => true,
             ]);
-
-            return redirect()->to('/movies')->with('success', 'Login successful.');
+            return redirect()->to('/movies');
         }
 
         return redirect()->to('/users/login')->with('error', 'Invalid credentials.');
@@ -49,6 +49,6 @@ class UserController extends Controller
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/users/login')->with('success', 'Logged out successfully.');
+        return redirect()->to('/users/login');
     }
 }
