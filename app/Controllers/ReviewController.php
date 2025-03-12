@@ -7,6 +7,10 @@ class ReviewController extends Controller
 {
     public function store()
     {
+        if (!session()->get('logged_in')) {
+            return redirect()->to('/users/login')->with('error', 'You must be logged in to post a review.');
+        }
+
         $model = new ReviewModel();
         $model->save([
             'user_id' => session()->get('user_id'),
@@ -14,6 +18,13 @@ class ReviewController extends Controller
             'rating' => $this->request->getPost('rating'),
             'comment' => $this->request->getPost('comment'),
         ]);
+
         return redirect()->to('/movies');
     }
+
+    public function create()
+{
+    return view('movies/review');
+}
+
 }

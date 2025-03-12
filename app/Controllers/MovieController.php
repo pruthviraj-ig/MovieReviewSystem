@@ -1,14 +1,26 @@
 <?php
 namespace App\Controllers;
 use App\Models\MovieModel;
+use App\Models\ReviewModel;
 use CodeIgniter\Controller;
 
 class MovieController extends Controller
 {
     public function index()
     {
-        $model = new MovieModel();
-        $data['movies'] = $model->findAll();
+        $movieModel = new MovieModel();
+        $reviewModel = new ReviewModel();
+
+        // Fetch all movies
+        $movies = $movieModel->findAll();
+
+        // Attach reviews to each movie
+        foreach ($movies as &$movie) {
+            $movie['reviews'] = $reviewModel->where('movie_id', $movie['id'])->findAll();
+        }
+
+        $data['movies'] = $movies;
+
         return view('movies/index', $data);
     }
 
@@ -27,6 +39,7 @@ class MovieController extends Controller
             'poster_url' => $this->request->getPost('poster_url'),
             'release_date' => $this->request->getPost('release_date'),
         ]);
+
         return redirect()->to('/movies');
     }
 }
