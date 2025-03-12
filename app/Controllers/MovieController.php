@@ -16,36 +16,16 @@ class MovieController extends Controller
 
         $movies = $movieModel->findAll();
 
+        // Fetch reviews and include user info
         foreach ($movies as &$movie) {
             $reviews = $reviewModel->where('movie_id', $movie['id'])->findAll();
-
             foreach ($reviews as &$review) {
                 $user = $userModel->find($review['user_id']);
-                $review['username'] = $user ? $user['username'] : 'Unknown User';
+                $review['username'] = $user ? $user['username'] : 'Unknown';
             }
-
             $movie['reviews'] = $reviews;
         }
 
         return view('movies/index', ['movies' => $movies]);
-    }
-
-    public function create()
-    {
-        return view('movies/create');
-    }
-
-    public function store()
-    {
-        $model = new MovieModel();
-        $model->save([
-            'omdb_id' => $this->request->getPost('omdb_id'),
-            'title' => $this->request->getPost('title'),
-            'synopsis' => $this->request->getPost('synopsis'),
-            'poster_url' => $this->request->getPost('poster_url'),
-            'release_date' => $this->request->getPost('release_date'),
-        ]);
-
-        return redirect()->to('/movies')->with('success', 'Movie added successfully.');
     }
 }

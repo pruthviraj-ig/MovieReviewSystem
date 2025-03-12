@@ -11,8 +11,6 @@
         <a href="<?= site_url('users/logout') ?>">Logout</a>
     <?php endif; ?>
 
-    <a href="<?= site_url('movies/create') ?>">Add New Movie</a>
-
     <!-- Success Message -->
     <?php if (session()->getFlashdata('success')): ?>
         <p style="color: green;"><strong><?= session()->getFlashdata('success') ?></strong></p>
@@ -22,7 +20,7 @@
         <?php foreach ($movies as $movie): ?>
             <li>
                 <h3><?= $movie['title'] ?> - <?= $movie['release_date'] ?></h3>
-                <a href="<?= site_url('reviews/create?movie_id=' . $movie['id']) ?>">Review</a>
+                <a href="<?= site_url('reviews/create/' . $movie['id']) ?>">Review</a>
 
                 <!-- Display Reviews with Username -->
                 <?php if (!empty($movie['reviews'])): ?>
